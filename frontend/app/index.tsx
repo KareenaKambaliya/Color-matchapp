@@ -38,7 +38,7 @@ export default function ColorMatchingGame() {
   const starAnim = useRef(new Animated.Value(1)).current;
 
   const circleStartPosition = useRef({ x: 0, y: 0 });
-  const boxPositions = useRef<Array<{ x: number; y: number; width: number; height: number; color: string }>>([]);
+  const boxPositions = useRef([]);
 
   useEffect(() => {
     setupAudio();
