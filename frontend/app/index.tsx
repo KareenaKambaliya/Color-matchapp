@@ -39,10 +39,6 @@ export default function ColorMatchingGame() {
   const circleStartPosition = useRef({ x: 0, y: 0 });
   const boxPositions = useRef([]);
 
-  useEffect(() => {
-    setupAudio();
-  }, []);
-
   const setupAudio = async () => {
     try {
       await Audio.setAudioModeAsync({
@@ -53,6 +49,10 @@ export default function ColorMatchingGame() {
       console.log('Audio setup error:', error);
     }
   };
+
+  useEffect(() => {
+    setupAudio();
+  }, []);
 
   const speakColor = (colorName) => {
     const options = {
