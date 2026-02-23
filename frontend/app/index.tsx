@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   Dimensions,
-  TouchableOpacity,
   Animated,
   Platform,
 } from 'react-native';
@@ -55,7 +54,7 @@ export default function ColorMatchingGame() {
     }
   };
 
-  const speakColor = (colorName: string) => {
+  const speakColor = (colorName) => {
     const options = {
       language: 'en-US',
       pitch: 1.2,
@@ -64,7 +63,7 @@ export default function ColorMatchingGame() {
     Speech.speak(colorName, options);
   };
 
-  const handleGestureEvent = (event: any) => {
+  const handleGestureEvent = (event) => {
     if (!dragging) return;
     
     const { translationX, translationY } = event.nativeEvent;
@@ -72,7 +71,7 @@ export default function ColorMatchingGame() {
     translateY.setValue(translationY);
   };
 
-  const handleGestureStateChange = (event: any) => {
+  const handleGestureStateChange = (event) => {
     const { state, translationX, translationY } = event.nativeEvent;
 
     if (state === 5) { // ENDED
@@ -187,12 +186,12 @@ export default function ColorMatchingGame() {
     scaleAnim.setValue(1);
   };
 
-  const onCircleLayout = (event: any) => {
+  const onCircleLayout = (event) => {
     const { x, y } = event.nativeEvent.layout;
     circleStartPosition.current = { x, y };
   };
 
-  const onBoxLayout = (index: number, color: string) => (event: any) => {
+  const onBoxLayout = (index, color) => (event) => {
     const { x, y, width, height } = event.nativeEvent.layout;
     boxPositions.current[index] = { x, y, width, height, color };
   };
@@ -281,7 +280,6 @@ const styles = StyleSheet.create({
   background: {
     flex: 1,
     backgroundColor: '#87CEEB',
-    background: 'linear-gradient(180deg, #87CEEB 0%, #FFB6C1 100%)',
   },
   starContainer: {
     position: 'absolute',
