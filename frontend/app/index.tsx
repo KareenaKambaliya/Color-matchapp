@@ -59,24 +59,26 @@ export default function ColorMatchingGame() {
     for (let i = 0; i < boxLayouts.length; i++) {
       const box = boxLayouts[i];
       
-      // Check if circle center is inside box
+      // Check if gesture point is inside box bounds with some tolerance
+      const tolerance = 20; // pixels of tolerance for easier matching
       if (
-        gestureX >= box.x &&
-        gestureX <= box.x + box.width &&
-        gestureY >= box.y &&
-        gestureY <= box.y + box.height
+        gestureX >= box.x - tolerance &&
+        gestureX <= box.x + box.width + tolerance &&
+        gestureY >= box.y - tolerance &&
+        gestureY <= box.y + box.height + tolerance
       ) {
         console.log('Hit box:', box.color, 'at', box.x, box.y);
         
         if (box.color === currentColor.name) {
-          console.log('MATCH!');
+          console.log('CORRECT MATCH!');
           return true;
         } else {
-          console.log('Wrong color');
+          console.log('Wrong color - no penalty');
           return false;
         }
       }
     }
+    console.log('No box hit');
     return false;
   };
 
