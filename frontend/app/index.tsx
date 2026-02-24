@@ -326,10 +326,15 @@ const styles = StyleSheet.create({
     color: '#FF6347',
     marginLeft: 12,
   },
-  circle: {
+  circleContainer: {
     position: 'absolute',
     top: height * 0.22,
     left: width / 2 - CIRCLE_SIZE / 2,
+    width: CIRCLE_SIZE,
+    height: CIRCLE_SIZE,
+    zIndex: 100,
+  },
+  circle: {
     width: CIRCLE_SIZE,
     height: CIRCLE_SIZE,
     borderRadius: CIRCLE_SIZE / 2,
@@ -342,7 +347,6 @@ const styles = StyleSheet.create({
     borderColor: '#FFF',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 100,
   },
   sparkleContainer: {
     position: 'absolute',
