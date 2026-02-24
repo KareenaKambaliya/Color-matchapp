@@ -334,6 +334,11 @@ export default function ColorMatchingGame() {
 
         {/* Instruction Text */}
         <Text style={styles.instructionText}>Drag the circle to matching color!</Text>
+        
+        {/* Debug Info */}
+        <View style={styles.debugContainer}>
+          <Text style={styles.debugText}>{debugInfo}</Text>
+        </View>
 
         {/* Color Boxes */}
         <View style={styles.boxesContainer}>
