@@ -56,31 +56,18 @@ export default function ColorMatchingGame() {
   const checkCollision = (circleCenterX, circleCenterY) => {
     const currentColor = COLORS[currentColorIndex];
     
-    console.log('=== COLLISION CHECK ===');
-    console.log('Circle center position:', { x: circleCenterX.toFixed(1), y: circleCenterY.toFixed(1) });
-    console.log('Looking for color:', currentColor.name);
+    setDebugInfo(`Checking: ${currentColor.name} at (${circleCenterX.toFixed(0)}, ${circleCenterY.toFixed(0)})`);
     
     // Check if circle is in the bottom area (below 60% of screen height)
     const bottomThreshold = height * 0.6;
     
-    console.log('Bottom threshold (60% of screen):', bottomThreshold.toFixed(1));
-    console.log('Is circle in bottom area?', circleCenterY > bottomThreshold ? 'YES ✓' : 'NO ✗');
-    
     if (circleCenterY < bottomThreshold) {
-      console.log('✗ Not dropped in bottom area - no match');
+      setDebugInfo(`Not in bottom area - try again!`);
       return false;
     }
     
     // Circle is in bottom area - determine which box by X position
-    // Boxes are evenly spaced: Red, Blue, Green, Yellow (left to right)
     const boxWidth = width / 4;
-    
-    console.log('Screen divided into 4 sections of width:', boxWidth.toFixed(1));
-    console.log('Color positions:');
-    console.log('  Red (index 0):    0 -', boxWidth.toFixed(1));
-    console.log('  Blue (index 1):  ', boxWidth.toFixed(1), '-', (boxWidth * 2).toFixed(1));
-    console.log('  Green (index 2): ', (boxWidth * 2).toFixed(1), '-', (boxWidth * 3).toFixed(1));
-    console.log('  Yellow (index 3):', (boxWidth * 3).toFixed(1), '-', width.toFixed(1));
     
     // Find which section the circle is in
     let selectedBoxIndex = Math.floor(circleCenterX / boxWidth);
@@ -90,16 +77,13 @@ export default function ColorMatchingGame() {
     
     const selectedColor = COLORS[selectedBoxIndex];
     
-    console.log('Circle X position:', circleCenterX.toFixed(1));
-    console.log('Selected box index:', selectedBoxIndex);
-    console.log('Selected box color:', selectedColor.name);
-    console.log('Need to match:', currentColor.name);
+    setDebugInfo(`You dropped on: ${selectedColor.name.toUpperCase()}`);
     
     if (selectedColor.name === currentColor.name) {
-      console.log('✓✓✓ COLORS MATCH! 🎉');
+      setDebugInfo(`✓ MATCH! ${currentColor.name.toUpperCase()}!`);
       return true;
     } else {
-      console.log('✗ Wrong color:', selectedColor.name, '≠', currentColor.name);
+      setDebugInfo(`✗ Wrong! Need ${currentColor.name.toUpperCase()}, got ${selectedColor.name.toUpperCase()}`);
       return false;
     }
   };
