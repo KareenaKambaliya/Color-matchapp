@@ -49,36 +49,51 @@ export default function ColorMatchingGame() {
     }
   };
 
-  const checkCollision = (gestureX, gestureY) => {
+  const checkCollision = (circleCenterX, circleCenterY) => {
     const currentColor = COLORS[currentColorIndex];
     
-    console.log('Check collision at:', gestureX, gestureY);
-    console.log('Current color:', currentColor.name);
-    console.log('Box layouts:', boxLayouts);
+    console.log('=== Checking Collision ===');
+    console.log('Circle center:', circleCenterX, circleCenterY);
+    console.log('Looking for color:', currentColor.name);
+    console.log('Available boxes:', boxLayouts.length);
+
+    if (boxLayouts.length === 0) {
+      console.log('⚠ No boxes laid out yet!');
+      return false;
+    }
 
     for (let i = 0; i < boxLayouts.length; i++) {
       const box = boxLayouts[i];
       
-      // Check if gesture point is inside box bounds with some tolerance
-      const tolerance = 20; // pixels of tolerance for easier matching
-      if (
-        gestureX >= box.x - tolerance &&
-        gestureX <= box.x + box.width + tolerance &&
-        gestureY >= box.y - tolerance &&
-        gestureY <= box.y + box.height + tolerance
-      ) {
-        console.log('Hit box:', box.color, 'at', box.x, box.y);
+      console.log(`Box ${i} (${box.color}):`, {
+        x: box.x,
+        y: box.y,
+        centerX: box.centerX,
+        centerY: box.centerY
+      });
+      
+      // Use generous tolerance for easier matching (especially for toddlers)
+      const tolerance = 45; // Larger tolerance
+      
+      // Check if circle center is near box center
+      const distanceX = Math.abs(circleCenterX - box.centerX);
+      const distanceY = Math.abs(circleCenterY - box.centerY);
+      
+      console.log(`  Distance from circle: X=${distanceX.toFixed(0)}, Y=${distanceY.toFixed(0)}`);
+      
+      if (distanceX < tolerance + BOX_SIZE / 2 && distanceY < tolerance + BOX_SIZE / 2) {
+        console.log(`  ✓ Circle is near ${box.color} box!`);
         
         if (box.color === currentColor.name) {
-          console.log('CORRECT MATCH!');
+          console.log('  ✓✓ COLOR MATCH! 🎉');
           return true;
         } else {
-          console.log('Wrong color - no penalty');
+          console.log(`  ✗ Wrong color (expected ${currentColor.name})`);
           return false;
         }
       }
     }
-    console.log('No box hit');
+    console.log('✗ Circle not near any box');
     return false;
   };
 
