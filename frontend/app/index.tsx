@@ -106,6 +106,8 @@ export default function ColorMatchingGame() {
   const handleCorrectMatch = () => {
     try {
       console.log('✓✓✓ CELEBRATION STARTING ✓✓✓');
+      console.log('Current color index:', currentColorIndex);
+      console.log('Current color:', COLORS[currentColorIndex].name);
       
       // Show sparkles
       setShowSparkles(true);
@@ -152,23 +154,28 @@ export default function ColorMatchingGame() {
       // Increment stars
       setStars((prev) => {
         const newStars = prev + 1;
-        console.log('✓ Stars increased to:', newStars);
+        console.log('✓ Stars increased from', prev, 'to', newStars);
         return newStars;
       });
 
       // Reset position and move to next color
       setTimeout(() => {
-        console.log('✓ Resetting for next color');
+        console.log('✓ Resetting for next color...');
+        console.log('  Resetting pan to (0, 0)');
         pan.setValue({ x: 0, y: 0 });
+        console.log('  Resetting scale to 1');
         scaleAnim.setValue(1);
+        
         setCurrentColorIndex((prev) => {
           const nextIndex = (prev + 1) % COLORS.length;
-          console.log('✓ Next color:', COLORS[nextIndex].name);
+          console.log('  Changing color from index', prev, '(' + COLORS[prev].name + ') to index', nextIndex, '(' + COLORS[nextIndex].name + ')');
           return nextIndex;
         });
+        
+        console.log('✓ Reset complete - new color should appear');
       }, 1000);
       
-      console.log('✓✓✓ CELEBRATION COMPLETE ✓✓✓');
+      console.log('✓✓✓ CELEBRATION SETUP COMPLETE ✓✓✓');
     } catch (error) {
       console.error('❌ ERROR in handleCorrectMatch:', error);
       console.error('Error details:', error.message, error.stack);
