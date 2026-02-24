@@ -36,9 +36,14 @@ export default function ColorMatchingGame() {
 
   const speakColor = (colorName) => {
     try {
-      // Stop any ongoing speech (only available on native)
-      if (Speech.stop && typeof Speech.stop === 'function') {
-        Speech.stop();
+      // Try to stop any ongoing speech (may not work on web)
+      try {
+        if (Speech.stop) {
+          Speech.stop();
+        }
+      } catch (stopError) {
+        // Ignore stop errors on web
+        console.log('Speech stop not available (web platform)');
       }
       
       Speech.speak(colorName, {
@@ -47,11 +52,11 @@ export default function ColorMatchingGame() {
         rate: 0.75,
         volume: 1.0,
       });
-      console.log('Speaking:', colorName);
+      console.log('✓ Speaking:', colorName);
     } catch (error) {
-      console.log('Speech error:', error);
+      console.log('Speech not available:', error.message);
       // Fallback: just log the color
-      console.log('COLOR:', colorName.toUpperCase());
+      console.log('🎨 COLOR:', colorName.toUpperCase(), '🎨');
     }
   };
 
