@@ -28,6 +28,7 @@ export default function ColorMatchingGame() {
   const [stars, setStars] = useState(0);
   const [showSparkles, setShowSparkles] = useState(false);
   const [boxLayouts, setBoxLayouts] = useState([]);
+  const [debugInfo, setDebugInfo] = useState('Drag circle to matching box!');
 
   const pan = useRef(new Animated.ValueXY()).current;
   const sparkleAnim = useRef(new Animated.Value(0)).current;
