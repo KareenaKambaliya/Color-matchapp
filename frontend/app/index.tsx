@@ -340,6 +340,7 @@ const styles = StyleSheet.create({
     borderColor: '#FFF',
     justifyContent: 'center',
     alignItems: 'center',
+    zIndex: 100,
   },
   sparkleContainer: {
     position: 'absolute',
