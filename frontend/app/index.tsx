@@ -159,21 +159,29 @@ export default function ColorMatchingGame() {
       },
 
       onPanResponderRelease: (evt, gestureState) => {
-        console.log('Pan released at:', evt.nativeEvent.pageX, evt.nativeEvent.pageY);
+        console.log('===== DRAG RELEASED =====');
+        console.log('Touch point:', evt.nativeEvent.pageX, evt.nativeEvent.pageY);
+        console.log('Gesture delta:', gestureState.dx, gestureState.dy);
         
         pan.flattenOffset();
 
-        // Get the absolute position where user released
-        const releaseX = evt.nativeEvent.pageX;
-        const releaseY = evt.nativeEvent.pageY;
+        // Calculate the center position of the circle after drag
+        const circleCenterY = height * 0.22 + CIRCLE_SIZE / 2 + gestureState.dy;
+        const circleCenterX = width / 2 + gestureState.dx;
+        
+        console.log('Circle center position:', circleCenterX, circleCenterY);
+        console.log('Number of boxes:', boxLayouts.length);
+        console.log('Current color to match:', COLORS[currentColorIndex].name);
 
-        const isMatch = checkCollision(releaseX, releaseY);
+        const isMatch = checkCollision(circleCenterX, circleCenterY);
 
         if (isMatch) {
           // Correct match!
+          console.log('✓ MATCH CONFIRMED - Triggering celebration');
           handleCorrectMatch();
         } else {
           // Bounce back
+          console.log('✗ No match - bouncing back');
           Animated.parallel([
             Animated.spring(pan, {
               toValue: { x: 0, y: 0 },
