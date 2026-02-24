@@ -191,21 +191,23 @@ export default function ColorMatchingGame() {
   const onBoxLayout = (index, colorName) => (event) => {
     const { x, y, width, height } = event.nativeEvent.layout;
     
-    // Convert to absolute position
-    event.target.measure((fx, fy, w, h, px, py) => {
-      console.log('Box layout:', colorName, 'at absolute pos:', px, py);
-      
-      setBoxLayouts((prev) => {
-        const newLayouts = [...prev];
-        newLayouts[index] = {
-          color: colorName,
-          x: px,
-          y: py,
-          width: w,
-          height: h,
-        };
-        return newLayouts;
-      });
+    // Calculate absolute position from bottom
+    const absoluteY = height > 0 ? Dimensions.get('window').height - (Platform.OS === 'ios' ? 100 : 80) - height : y;
+    const boxSpacing = (Dimensions.get('window').width - (BOX_SIZE * 4 + 30)) / 5;
+    const absoluteX = 15 + boxSpacing + (index * (BOX_SIZE + boxSpacing));
+    
+    console.log('Box layout:', colorName, 'at pos:', absoluteX, absoluteY);
+    
+    setBoxLayouts((prev) => {
+      const newLayouts = [...prev];
+      newLayouts[index] = {
+        color: colorName,
+        x: absoluteX,
+        y: absoluteY,
+        width: BOX_SIZE,
+        height: BOX_SIZE,
+      };
+      return newLayouts;
     });
   };
 
