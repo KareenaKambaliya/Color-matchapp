@@ -189,21 +189,30 @@ export default function ColorMatchingGame() {
   ).current;
 
   const onBoxLayout = (index, colorName) => (event) => {
-    const { x, y, width, height } = event.nativeEvent.layout;
+    // Calculate box positions based on screen dimensions
+    const screenWidth = Dimensions.get('window').width;
+    const screenHeight = Dimensions.get('window').height;
+    const bottomOffset = Platform.OS === 'ios' ? 100 : 80;
     
-    // Calculate absolute position from bottom
-    const absoluteY = height > 0 ? Dimensions.get('window').height - (Platform.OS === 'ios' ? 100 : 80) - height : y;
-    const boxSpacing = (Dimensions.get('window').width - (BOX_SIZE * 4 + 30)) / 5;
-    const absoluteX = 15 + boxSpacing + (index * (BOX_SIZE + boxSpacing));
+    // Calculate horizontal position - evenly spaced
+    const totalPadding = 30; // 15px on each side
+    const availableWidth = screenWidth - totalPadding;
+    const spacing = (availableWidth - (BOX_SIZE * 4)) / 3; // space between boxes
+    const startX = 15 + (BOX_SIZE / 2); // center of first box
     
-    console.log('Box layout:', colorName, 'at pos:', absoluteX, absoluteY);
+    const boxCenterX = startX + (index * (BOX_SIZE + spacing));
+    const boxCenterY = screenHeight - bottomOffset - (BOX_SIZE / 2);
+    
+    console.log(`Box ${colorName} center at: (${boxCenterX}, ${boxCenterY})`);
     
     setBoxLayouts((prev) => {
       const newLayouts = [...prev];
       newLayouts[index] = {
         color: colorName,
-        x: absoluteX,
-        y: absoluteY,
+        x: boxCenterX - (BOX_SIZE / 2), // top-left x
+        y: boxCenterY - (BOX_SIZE / 2), // top-left y
+        centerX: boxCenterX,
+        centerY: boxCenterY,
         width: BOX_SIZE,
         height: BOX_SIZE,
       };
