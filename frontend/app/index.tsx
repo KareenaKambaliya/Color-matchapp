@@ -208,19 +208,23 @@ export default function ColorMatchingGame() {
         
         pan.flattenOffset();
 
-        // Calculate the center position of the circle after drag
-        const circleCenterY = height * 0.22 + CIRCLE_SIZE / 2 + gestureState.dy;
-        const circleCenterX = width / 2 + gestureState.dx;
+        // Calculate the circle's final position
+        const initialCircleTop = height * 0.22 + CIRCLE_SIZE / 2;
+        const initialCircleLeft = width / 2;
         
-        console.log('Circle center position:', circleCenterX, circleCenterY);
-        console.log('Number of boxes:', boxLayouts.length);
+        const finalCircleCenterX = initialCircleLeft + gestureState.dx;
+        const finalCircleCenterY = initialCircleTop + gestureState.dy;
+        
+        console.log('Initial circle position:', { x: initialCircleLeft, y: initialCircleTop });
+        console.log('Final circle center:', { x: finalCircleCenterX, y: finalCircleCenterY });
+        console.log('Screen dimensions:', { width, height });
         console.log('Current color to match:', COLORS[currentColorIndex].name);
 
-        const isMatch = checkCollision(circleCenterX, circleCenterY);
+        const isMatch = checkCollision(finalCircleCenterX, finalCircleCenterY);
 
         if (isMatch) {
           // Correct match!
-          console.log('✓ MATCH CONFIRMED - Triggering celebration');
+          console.log('✓✓✓ MATCH CONFIRMED - Triggering celebration ✓✓✓');
           handleCorrectMatch();
         } else {
           // Bounce back
