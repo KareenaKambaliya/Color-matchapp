@@ -223,6 +223,8 @@ export default function ColorMatchingGame() {
   };
 
   const currentColor = COLORS[currentColorIndex];
+  
+  console.log('Rendering circle with color:', currentColor.name, currentColor.value);
 
   return (
     <View style={styles.container}>
