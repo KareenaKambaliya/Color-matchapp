@@ -101,53 +101,75 @@ export default function ColorMatchingGame() {
   };
 
   const handleCorrectMatch = () => {
-    console.log('Correct match! Playing celebration');
-    
-    // Show sparkles
-    setShowSparkles(true);
-    
-    // Sparkle animation
-    Animated.sequence([
-      Animated.timing(sparkleAnim, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: true,
-      }),
-      Animated.timing(sparkleAnim, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      setShowSparkles(false);
-    });
+    try {
+      console.log('✓✓✓ CELEBRATION STARTING ✓✓✓');
+      
+      // Show sparkles
+      setShowSparkles(true);
+      console.log('✓ Sparkles enabled');
+      
+      // Sparkle animation
+      Animated.sequence([
+        Animated.timing(sparkleAnim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(sparkleAnim, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        setShowSparkles(false);
+        console.log('✓ Sparkle animation complete');
+      });
 
-    // Star animation
-    Animated.sequence([
-      Animated.spring(starAnim, {
-        toValue: 1.4,
-        friction: 3,
-        useNativeDriver: true,
-      }),
-      Animated.spring(starAnim, {
-        toValue: 1,
-        friction: 3,
-        useNativeDriver: true,
-      }),
-    ]).start();
+      // Star animation
+      Animated.sequence([
+        Animated.spring(starAnim, {
+          toValue: 1.4,
+          friction: 3,
+          useNativeDriver: true,
+        }),
+        Animated.spring(starAnim, {
+          toValue: 1,
+          friction: 3,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        console.log('✓ Star animation complete');
+      });
 
-    // Speak the color name
-    speakColor(COLORS[currentColorIndex].displayName);
+      // Speak the color name
+      const colorToSpeak = COLORS[currentColorIndex].displayName;
+      console.log('✓ Speaking color:', colorToSpeak);
+      speakColor(colorToSpeak);
 
-    // Increment stars
-    setStars((prev) => prev + 1);
+      // Increment stars
+      setStars((prev) => {
+        const newStars = prev + 1;
+        console.log('✓ Stars increased to:', newStars);
+        return newStars;
+      });
 
-    // Reset position and move to next color
-    setTimeout(() => {
-      pan.setValue({ x: 0, y: 0 });
-      scaleAnim.setValue(1);
-      setCurrentColorIndex((prev) => (prev + 1) % COLORS.length);
-    }, 1000);
+      // Reset position and move to next color
+      setTimeout(() => {
+        console.log('✓ Resetting for next color');
+        pan.setValue({ x: 0, y: 0 });
+        scaleAnim.setValue(1);
+        setCurrentColorIndex((prev) => {
+          const nextIndex = (prev + 1) % COLORS.length;
+          console.log('✓ Next color:', COLORS[nextIndex].name);
+          return nextIndex;
+        });
+      }, 1000);
+      
+      console.log('✓✓✓ CELEBRATION COMPLETE ✓✓✓');
+    } catch (error) {
+      console.error('❌ ERROR in handleCorrectMatch:', error);
+      console.error('Error details:', error.message, error.stack);
+    }
   };
 
   const panResponder = useRef(
