@@ -236,44 +236,46 @@ export default function ColorMatchingGame() {
         </View>
 
         {/* Draggable Circle */}
-        <Animated.View
-          {...panResponder.panHandlers}
-          style={[
-            styles.circle,
-            {
-              backgroundColor: currentColor.value,
-              transform: [
-                { translateX: pan.x },
-                { translateY: pan.y },
-                { scale: scaleAnim },
-              ],
-            },
-          ]}
-        >
-          {showSparkles && (
-            <Animated.View
-              style={[
-                styles.sparkleContainer,
-                {
-                  opacity: sparkleAnim,
-                  transform: [
-                    {
-                      scale: sparkleAnim.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [0.5, 2],
-                      }),
-                    },
-                  ],
-                },
-              ]}
-            >
-              <MaterialCommunityIcons name="star-four-points" size={80} color="#FFD700" />
-              <MaterialCommunityIcons name="star-four-points" size={50} color="#FFF" style={styles.sparkle1} />
-              <MaterialCommunityIcons name="star-four-points" size={50} color="#FFF" style={styles.sparkle2} />
-              <MaterialCommunityIcons name="star-four-points" size={50} color="#FFF" style={styles.sparkle3} />
-            </Animated.View>
-          )}
-        </Animated.View>
+        <View style={styles.circleContainer}>
+          <Animated.View
+            {...panResponder.panHandlers}
+            style={[
+              styles.circle,
+              {
+                backgroundColor: currentColor.value,
+                transform: [
+                  { translateX: pan.x },
+                  { translateY: pan.y },
+                  { scale: scaleAnim },
+                ],
+              },
+            ]}
+          >
+            {showSparkles && (
+              <Animated.View
+                style={[
+                  styles.sparkleContainer,
+                  {
+                    opacity: sparkleAnim,
+                    transform: [
+                      {
+                        scale: sparkleAnim.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [0.5, 2],
+                        }),
+                      },
+                    ],
+                  },
+                ]}
+              >
+                <MaterialCommunityIcons name="star-four-points" size={80} color="#FFD700" />
+                <MaterialCommunityIcons name="star-four-points" size={50} color="#FFF" style={styles.sparkle1} />
+                <MaterialCommunityIcons name="star-four-points" size={50} color="#FFF" style={styles.sparkle2} />
+                <MaterialCommunityIcons name="star-four-points" size={50} color="#FFF" style={styles.sparkle3} />
+              </Animated.View>
+            )}
+          </Animated.View>
+        </View>
 
         {/* Instruction Text */}
         <Text style={styles.instructionText}>Drag the circle to matching color!</Text>
