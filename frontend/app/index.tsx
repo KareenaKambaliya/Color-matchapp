@@ -36,7 +36,11 @@ export default function ColorMatchingGame() {
 
   const speakColor = (colorName) => {
     try {
-      Speech.stop();
+      // Stop any ongoing speech (only available on native)
+      if (Speech.stop && typeof Speech.stop === 'function') {
+        Speech.stop();
+      }
+      
       Speech.speak(colorName, {
         language: 'en-US',
         pitch: 1.3,
@@ -46,6 +50,8 @@ export default function ColorMatchingGame() {
       console.log('Speaking:', colorName);
     } catch (error) {
       console.log('Speech error:', error);
+      // Fallback: just log the color
+      console.log('COLOR:', colorName.toUpperCase());
     }
   };
 
