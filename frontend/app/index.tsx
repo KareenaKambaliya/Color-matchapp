@@ -147,13 +147,19 @@ export default function ColorMatchingGame() {
       setTimeout(() => {
         console.log('✓ Resetting for next color...');
         console.log('  Resetting pan to (0, 0)');
+        
+        // IMPORTANT: Reset both value AND offset
+        pan.flattenOffset();
         pan.setValue({ x: 0, y: 0 });
+        pan.setOffset({ x: 0, y: 0 });
+        
         console.log('  Resetting scale to 1');
         scaleAnim.setValue(1);
         
         setCurrentColorIndex((prev) => {
           const nextIndex = (prev + 1) % COLORS.length;
           console.log('  Changing color from index', prev, '(' + COLORS[prev].name + ') to index', nextIndex, '(' + COLORS[nextIndex].name + ')');
+          setDebugInfo(`Now match: ${COLORS[nextIndex].displayName}!`);
           return nextIndex;
         });
         
