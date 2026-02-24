@@ -56,49 +56,49 @@ export default function ColorMatchingGame() {
     const currentColor = COLORS[currentColorIndex];
     
     console.log('=== COLLISION CHECK ===');
-    console.log('Circle center:', circleCenterX, circleCenterY);
-    console.log('Need to match:', currentColor.name);
+    console.log('Circle center position:', { x: circleCenterX.toFixed(1), y: circleCenterY.toFixed(1) });
+    console.log('Looking for color:', currentColor.name);
     
-    // Simple approach: Check if circle is in the bottom third of screen
-    const screenHeight = Dimensions.get('window').height;
-    const screenWidth = Dimensions.get('window').width;
-    const bottomThreshold = screenHeight * 0.65; // Bottom 35% of screen
+    // Check if circle is in the bottom area (below 60% of screen height)
+    const bottomThreshold = height * 0.6;
     
-    console.log('Screen height:', screenHeight);
-    console.log('Bottom threshold:', bottomThreshold);
-    console.log('Is in bottom area?', circleCenterY > bottomThreshold);
+    console.log('Bottom threshold (60% of screen):', bottomThreshold.toFixed(1));
+    console.log('Is circle in bottom area?', circleCenterY > bottomThreshold ? 'YES ✓' : 'NO ✗');
     
     if (circleCenterY < bottomThreshold) {
-      console.log('✗ Not in bottom area');
+      console.log('✗ Not dropped in bottom area - no match');
       return false;
     }
     
-    // Circle is in bottom area - figure out which box it's over
-    // Divide screen width into 4 equal sections
-    const sectionWidth = screenWidth / 4;
-    let closestBoxIndex = -1;
-    let minDistance = Infinity;
+    // Circle is in bottom area - determine which box by X position
+    // Boxes are evenly spaced: Red, Blue, Green, Yellow (left to right)
+    const boxWidth = width / 4;
     
-    for (let i = 0; i < 4; i++) {
-      const sectionCenterX = sectionWidth * i + sectionWidth / 2;
-      const distance = Math.abs(circleCenterX - sectionCenterX);
-      console.log(`Box ${i} (${COLORS[i].name}) section center: ${sectionCenterX}, distance: ${distance}`);
-      
-      if (distance < minDistance) {
-        minDistance = distance;
-        closestBoxIndex = i;
-      }
-    }
+    console.log('Screen divided into 4 sections of width:', boxWidth.toFixed(1));
+    console.log('Color positions:');
+    console.log('  Red (index 0):    0 -', boxWidth.toFixed(1));
+    console.log('  Blue (index 1):  ', boxWidth.toFixed(1), '-', (boxWidth * 2).toFixed(1));
+    console.log('  Green (index 2): ', (boxWidth * 2).toFixed(1), '-', (boxWidth * 3).toFixed(1));
+    console.log('  Yellow (index 3):', (boxWidth * 3).toFixed(1), '-', width.toFixed(1));
     
-    console.log('Closest box index:', closestBoxIndex);
-    console.log('Closest box color:', COLORS[closestBoxIndex].name);
-    console.log('Current color:', currentColor.name);
+    // Find which section the circle is in
+    let selectedBoxIndex = Math.floor(circleCenterX / boxWidth);
     
-    if (COLORS[closestBoxIndex].name === currentColor.name) {
-      console.log('✓✓✓ MATCH! 🎉🎉🎉');
+    // Clamp to valid range (0-3)
+    selectedBoxIndex = Math.max(0, Math.min(3, selectedBoxIndex));
+    
+    const selectedColor = COLORS[selectedBoxIndex];
+    
+    console.log('Circle X position:', circleCenterX.toFixed(1));
+    console.log('Selected box index:', selectedBoxIndex);
+    console.log('Selected box color:', selectedColor.name);
+    console.log('Need to match:', currentColor.name);
+    
+    if (selectedColor.name === currentColor.name) {
+      console.log('✓✓✓ COLORS MATCH! 🎉');
       return true;
     } else {
-      console.log('✗ Wrong color');
+      console.log('✗ Wrong color:', selectedColor.name, '≠', currentColor.name);
       return false;
     }
   };
