@@ -54,12 +54,13 @@ export default function ColorMatchingGame() {
     }
   };
 
-  const checkCollision = (circleCenterX, circleCenterY, expectedColorIndex) => {
-    // Use passed index or current if not provided
-    const colorIndex = expectedColorIndex !== undefined ? expectedColorIndex : currentColorIndex;
+  const checkCollision = (circleCenterX, circleCenterY) => {
+    // Use ref to get the ACTUAL current color index (not closure value)
+    const colorIndex = currentColorIndexRef.current;
     const currentColor = COLORS[colorIndex];
     
-    setDebugInfo(`Checking: ${currentColor.name} at (${circleCenterX.toFixed(0)}, ${circleCenterY.toFixed(0)})`);
+    console.log('Checking collision - colorIndex from ref:', colorIndex, 'color:', currentColor.name);
+    setDebugInfo(`Need: ${currentColor.name.toUpperCase()}`);
     
     // Check if circle is in the bottom area (below 60% of screen height)
     const bottomThreshold = height * 0.6;
@@ -80,6 +81,7 @@ export default function ColorMatchingGame() {
     
     const selectedColor = COLORS[selectedBoxIndex];
     
+    console.log('Selected box:', selectedBoxIndex, selectedColor.name, '| Need:', currentColor.name);
     setDebugInfo(`You dropped on: ${selectedColor.name.toUpperCase()}`);
     
     if (selectedColor.name === currentColor.name) {
