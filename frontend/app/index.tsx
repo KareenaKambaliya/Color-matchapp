@@ -256,10 +256,15 @@ export default function ColorMatchingGame() {
       }
       console.log('New matched array:', newMatched);
       console.log('Unique matched count:', newMatched.length);
+      
+      // Check if ALL level colors are now matched
+      const allLevelColors = levelColors.map(c => c.name);
+      const allMatched = allLevelColors.every(color => newMatched.includes(color));
+      
+      console.log('All level colors:', allLevelColors);
+      console.log('All matched?', allMatched);
+      
       setMatchedColors(newMatched);
-
-      // Check if level is complete BEFORE resetting
-      const isLevelComplete = checkLevelComplete(newMatched);
 
       setTimeout(() => {
         pan.flattenOffset();
@@ -267,9 +272,22 @@ export default function ColorMatchingGame() {
         pan.setOffset({ x: 0, y: 0 });
         scaleAnim.setValue(1);
         
-        if (isLevelComplete) {
-          console.log('✅ Level complete - not advancing color');
-          return; // Level complete, don't advance color
+        if (allMatched) {
+          // LEVEL COMPLETE!
+          console.log('🎉🎉🎉 LEVEL COMPLETE! 🎉🎉🎉');
+          setDebugInfo('🎉 LEVEL COMPLETE! 🎉');
+          
+          setTimeout(() => {
+            if (currentLevelRef.current === 4) {
+              console.log('🏆 ALL LEVELS BEAT - VICTORY!');
+              triggerVictory();
+            } else {
+              console.log('⬆️ ADVANCING TO NEXT LEVEL');
+              advanceLevel();
+            }
+          }, 1500);
+          
+          return; // Don't advance to next color
         }
 
         // Move to next color in level
