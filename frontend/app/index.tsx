@@ -392,20 +392,15 @@ export default function ColorMatchingGame() {
         <View style={styles.levelContainer}>
           <Text style={styles.levelText}>Level {currentLevel + 1}</Text>
           <Text style={styles.levelName}>{LEVELS[currentLevel].name}</Text>
+          <Text style={styles.progressText}>{matchedColors.length}/{levelColors.length} matched</Text>
         </View>
 
-        {/* Star Counter */}
+        {/* Lifetime Stars (Only one star counter) */}
         <View style={styles.starContainer}>
           <Animated.View style={{ transform: [{ scale: starAnim }] }}>
-            <MaterialCommunityIcons name="star" size={40} color="#FFD700" />
+            <MaterialCommunityIcons name="star" size={45} color="#FFD700" />
           </Animated.View>
-          <Text style={styles.starText}>{stars}</Text>
-        </View>
-
-        {/* Lifetime Stars */}
-        <View style={styles.lifetimeContainer}>
-          <MaterialCommunityIcons name="star-circle" size={30} color="#FFD700" />
-          <Text style={styles.lifetimeText}>{lifetimeStars}</Text>
+          <Text style={styles.starText}>{lifetimeStars}</Text>
         </View>
 
         {/* Draggable Circle */}
