@@ -110,33 +110,44 @@ export default function ColorMatchingGame() {
   };
 
   const checkLevelComplete = (newMatchedColors) => {
-    console.log('🔍 Checking level complete...');
-    console.log('Matched colors:', newMatchedColors);
-    console.log('Total colors in level:', levelColors.length);
+    console.log('🔍 === CHECKING LEVEL COMPLETE ===');
+    console.log('Matched colors array:', newMatchedColors);
+    console.log('Matched count:', newMatchedColors.length);
     console.log('Level colors:', levelColors.map(c => c.name));
+    console.log('Required count:', levelColors.length);
+    console.log('Current level:', currentLevel);
+    console.log('Current level ref:', currentLevelRef.current);
     
-    if (newMatchedColors.length >= levelColors.length) {
-      console.log('🎉 LEVEL COMPLETE!');
+    // Check if all unique colors are matched
+    const uniqueMatched = [...new Set(newMatchedColors)];
+    const allLevelColors = levelColors.map(c => c.name);
+    const allMatched = allLevelColors.every(color => uniqueMatched.includes(color));
+    
+    console.log('Unique matched:', uniqueMatched);
+    console.log('All colors matched?', allMatched);
+    
+    if (allMatched) {
+      console.log('🎉🎉🎉 LEVEL COMPLETE! 🎉🎉🎉');
       setDebugInfo('🎉 LEVEL COMPLETE! 🎉');
       
       if (currentLevelRef.current === 4) {
-        // Beat Level 5 - Show victory!
-        console.log('🏆 ALL LEVELS COMPLETE - VICTORY!');
+        console.log('🏆 ALL LEVELS COMPLETE - SHOWING VICTORY!');
         setTimeout(() => {
           triggerVictory();
         }, 1500);
       } else {
-        // Advance to next level
         const nextLevelNum = currentLevelRef.current + 2;
-        console.log(`⬆️ Advancing to Level ${nextLevelNum}...`);
+        console.log(`⬆️⬆️⬆️ Advancing to Level ${nextLevelNum} in 1.5 seconds...`);
         setTimeout(() => {
+          console.log('Calling advanceLevel now!');
           advanceLevel();
         }, 1500);
       }
       return true;
     }
-    const remaining = levelColors.length - newMatchedColors.length;
-    console.log(`❌ Level not complete yet. Need ${remaining} more`);
+    
+    const remaining = levelColors.length - uniqueMatched.length;
+    console.log(`❌ Level not complete. Need ${remaining} more unique colors`);
     return false;
   };
 
