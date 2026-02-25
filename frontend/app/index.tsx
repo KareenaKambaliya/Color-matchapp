@@ -18,6 +18,39 @@ const COLORS = [
   { name: 'blue', value: '#007AFF', displayName: 'Blue' },
   { name: 'green', value: '#34C759', displayName: 'Green' },
   { name: 'yellow', value: '#FFCC00', displayName: 'Yellow' },
+  { name: 'orange', value: '#FF9500', displayName: 'Orange' },
+  { name: 'purple', value: '#AF52DE', displayName: 'Purple' },
+  { name: 'pink', value: '#FF2D55', displayName: 'Pink' },
+  { name: 'cyan', value: '#5AC8FA', displayName: 'Cyan' },
+];
+
+// Level configurations
+const LEVELS = [
+  { 
+    number: 1, 
+    colors: ['red', 'blue', 'green'],
+    name: 'Easy Peasy'
+  },
+  { 
+    number: 2, 
+    colors: ['red', 'blue', 'green', 'yellow'],
+    name: 'Getting Good'
+  },
+  { 
+    number: 3, 
+    colors: ['orange', 'purple', 'pink', 'cyan'],
+    name: 'New Colors'
+  },
+  { 
+    number: 4, 
+    colors: ['red', 'green', 'purple', 'orange', 'cyan'],
+    name: 'Color Mix'
+  },
+  { 
+    number: 5, 
+    colors: ['red', 'blue', 'yellow', 'purple', 'pink', 'orange'],
+    name: 'Master Level'
+  },
 ];
 
 const CIRCLE_SIZE = 120;
