@@ -53,8 +53,10 @@ export default function ColorMatchingGame() {
     }
   };
 
-  const checkCollision = (circleCenterX, circleCenterY) => {
-    const currentColor = COLORS[currentColorIndex];
+  const checkCollision = (circleCenterX, circleCenterY, expectedColorIndex) => {
+    // Use passed index or current if not provided
+    const colorIndex = expectedColorIndex !== undefined ? expectedColorIndex : currentColorIndex;
+    const currentColor = COLORS[colorIndex];
     
     setDebugInfo(`Checking: ${currentColor.name} at (${circleCenterX.toFixed(0)}, ${circleCenterY.toFixed(0)})`);
     
