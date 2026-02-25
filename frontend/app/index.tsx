@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   Animated,
   PanResponder,
   Platform,
+  TouchableOpacity,
 } from 'react-native';
 import * as Speech from 'expo-speech';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -26,47 +27,25 @@ const COLORS = [
 
 // Level configurations
 const LEVELS = [
-  { 
-    number: 1, 
-    colors: ['red', 'blue', 'green'],
-    name: 'Easy Peasy'
-  },
-  { 
-    number: 2, 
-    colors: ['red', 'blue', 'green', 'yellow'],
-    name: 'Getting Good'
-  },
-  { 
-    number: 3, 
-    colors: ['orange', 'purple', 'pink', 'cyan'],
-    name: 'New Colors'
-  },
-  { 
-    number: 4, 
-    colors: ['red', 'green', 'purple', 'orange', 'cyan'],
-    name: 'Color Mix'
-  },
-  { 
-    number: 5, 
-    colors: ['red', 'blue', 'yellow', 'purple', 'pink', 'orange'],
-    name: 'Master Level'
-  },
+  { number: 1, colors: ['red', 'blue', 'green'], name: 'Easy Peasy' },
+  { number: 2, colors: ['red', 'blue', 'green', 'yellow'], name: 'Getting Good' },
+  { number: 3, colors: ['orange', 'purple', 'pink', 'cyan'], name: 'New Colors' },
+  { number: 4, colors: ['red', 'green', 'purple', 'orange', 'cyan'], name: 'Color Mix' },
+  { number: 5, colors: ['red', 'blue', 'yellow', 'purple', 'pink', 'orange'], name: 'Master Level' },
 ];
 
 const CIRCLE_SIZE = 120;
-const BOX_SIZE = 90;
+const BOX_SIZE = 80;
 
 export default function ColorMatchingGame() {
   const [currentColorIndex, setCurrentColorIndex] = useState(0);
   const [stars, setStars] = useState(0);
   const [lifetimeStars, setLifetimeStars] = useState(0);
-  const [currentLevel, setCurrentLevel] = useState(0); // 0-4 for levels 1-5
-  const [matchedColors, setMatchedColors] = useState([]); // Track which colors matched in current level
+  const [currentLevel, setCurrentLevel] = useState(0);
+  const [matchedColors, setMatchedColors] = useState([]);
   const [showSparkles, setShowSparkles] = useState(false);
-  const [boxLayouts, setBoxLayouts] = useState([]);
-  const [debugInfo, setDebugInfo] = useState('Drag circle to matching box!');
+  const [debugInfo, setDebugInfo] = useState('Match colors to advance!');
   const [showVictory, setShowVictory] = useState(false);
-  const [confettiPieces, setConfettiPieces] = useState([]);
 
   const pan = useRef(new Animated.ValueXY()).current;
   const sparkleAnim = useRef(new Animated.Value(0)).current;
@@ -75,6 +54,11 @@ export default function ColorMatchingGame() {
   const confettiAnim = useRef(new Animated.Value(0)).current;
   const currentColorIndexRef = useRef(0);
   const currentLevelRef = useRef(0);
+
+  // Get current level colors
+  const levelColors = LEVELS[currentLevel].colors.map(colorName => 
+    COLORS.find(c => c.name === colorName)
+  );
 
   const speakColor = (colorName) => {
     try {
@@ -95,55 +79,109 @@ export default function ColorMatchingGame() {
   };
 
   const checkCollision = (circleCenterX, circleCenterY) => {
-    // Use ref to get the ACTUAL current color index (not closure value)
     const colorIndex = currentColorIndexRef.current;
-    const currentColor = COLORS[colorIndex];
+    const currentColor = levelColors[colorIndex];
     
     console.log('Checking collision - colorIndex from ref:', colorIndex, 'color:', currentColor.name);
-    setDebugInfo(`Need: ${currentColor.name.toUpperCase()}`);
+    setDebugInfo(`Need: ${currentColor.displayName.toUpperCase()}`);
     
-    // Check if circle is in the bottom area (below 60% of screen height)
     const bottomThreshold = height * 0.6;
     
     if (circleCenterY < bottomThreshold) {
-      setDebugInfo(`Not in bottom area - try again!`);
+      setDebugInfo(`Drag to bottom area!`);
       return false;
     }
     
-    // Circle is in bottom area - determine which box by X position
-    const boxWidth = width / 4;
-    
-    // Find which section the circle is in
+    const boxWidth = width / levelColors.length;
     let selectedBoxIndex = Math.floor(circleCenterX / boxWidth);
+    selectedBoxIndex = Math.max(0, Math.min(levelColors.length - 1, selectedBoxIndex));
     
-    // Clamp to valid range (0-3)
-    selectedBoxIndex = Math.max(0, Math.min(3, selectedBoxIndex));
-    
-    const selectedColor = COLORS[selectedBoxIndex];
+    const selectedColor = levelColors[selectedBoxIndex];
     
     console.log('Selected box:', selectedBoxIndex, selectedColor.name, '| Need:', currentColor.name);
-    setDebugInfo(`You dropped on: ${selectedColor.name.toUpperCase()}`);
     
     if (selectedColor.name === currentColor.name) {
-      setDebugInfo(`✓ MATCH! ${currentColor.name.toUpperCase()}!`);
+      setDebugInfo(`✓ ${currentColor.displayName.toUpperCase()}!`);
       return true;
     } else {
-      setDebugInfo(`✗ Wrong! Need ${currentColor.name.toUpperCase()}, got ${selectedColor.name.toUpperCase()}`);
+      setDebugInfo(`✗ Try ${currentColor.displayName.toUpperCase()}`);
       return false;
     }
+  };
+
+  const checkLevelComplete = (newMatchedColors) => {
+    if (newMatchedColors.length === levelColors.length) {
+      console.log('🎉 LEVEL COMPLETE!');
+      
+      if (currentLevel === 4) {
+        // Beat Level 5 - Show victory!
+        setTimeout(() => {
+          triggerVictory();
+        }, 1500);
+      } else {
+        // Advance to next level
+        setTimeout(() => {
+          advanceLevel();
+        }, 1500);
+      }
+      return true;
+    }
+    return false;
+  };
+
+  const advanceLevel = () => {
+    const nextLevel = currentLevel + 1;
+    setCurrentLevel(nextLevel);
+    currentLevelRef.current = nextLevel;
+    setCurrentColorIndex(0);
+    currentColorIndexRef.current = 0;
+    setMatchedColors([]);
+    setDebugInfo(`LEVEL ${nextLevel + 1}: ${LEVELS[nextLevel].name}!`);
+    speakColor(`Level ${nextLevel + 1}`);
+  };
+
+  const triggerVictory = () => {
+    console.log('🏆 VICTORY! 🏆');
+    setShowVictory(true);
+    speakColor('You are amazing! You beat all levels!');
+    
+    // Confetti animation
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(confettiAnim, {
+          toValue: 1,
+          duration: 3000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(confettiAnim, {
+          toValue: 0,
+          duration: 0,
+          useNativeDriver: true,
+        }),
+      ]),
+      { iterations: 3 }
+    ).start();
+  };
+
+  const playAgain = () => {
+    setShowVictory(false);
+    setCurrentLevel(0);
+    currentLevelRef.current = 0;
+    setCurrentColorIndex(0);
+    currentColorIndexRef.current = 0;
+    setMatchedColors([]);
+    setStars(0);
+    confettiAnim.setValue(0);
+    setDebugInfo('Level 1: Easy Peasy!');
   };
 
   const handleCorrectMatch = () => {
     try {
       console.log('✓✓✓ CELEBRATION STARTING ✓✓✓');
-      console.log('Current color index:', currentColorIndex);
-      console.log('Current color:', COLORS[currentColorIndex].name);
+      const currentColor = levelColors[currentColorIndexRef.current];
       
-      // Show sparkles
       setShowSparkles(true);
-      console.log('✓ Sparkles enabled');
       
-      // Sparkle animation
       Animated.sequence([
         Animated.timing(sparkleAnim, {
           toValue: 1,
@@ -157,10 +195,8 @@ export default function ColorMatchingGame() {
         }),
       ]).start(() => {
         setShowSparkles(false);
-        console.log('✓ Sparkle animation complete');
       });
 
-      // Star animation
       Animated.sequence([
         Animated.spring(starAnim, {
           toValue: 1.4,
@@ -172,63 +208,48 @@ export default function ColorMatchingGame() {
           friction: 3,
           useNativeDriver: true,
         }),
-      ]).start(() => {
-        console.log('✓ Star animation complete');
-      });
+      ]).start();
 
-      // Speak the color name
-      const colorToSpeak = COLORS[currentColorIndex].displayName;
-      console.log('✓ Speaking color:', colorToSpeak);
-      speakColor(colorToSpeak);
+      speakColor(currentColor.displayName);
 
-      // Increment stars
-      setStars((prev) => {
-        const newStars = prev + 1;
-        console.log('✓ Stars increased from', prev, 'to', newStars);
-        return newStars;
-      });
+      setStars((prev) => prev + 1);
+      setLifetimeStars((prev) => prev + 1);
 
-      // Reset position and move to next color
+      // Mark this color as matched
+      const newMatched = [...matchedColors, currentColor.name];
+      setMatchedColors(newMatched);
+
       setTimeout(() => {
-        console.log('✓ Resetting for next color...');
-        console.log('  Resetting pan to (0, 0)');
-        
-        // IMPORTANT: Reset both value AND offset
         pan.flattenOffset();
         pan.setValue({ x: 0, y: 0 });
         pan.setOffset({ x: 0, y: 0 });
-        
-        console.log('  Resetting scale to 1');
         scaleAnim.setValue(1);
         
+        // Check if level is complete
+        if (checkLevelComplete(newMatched)) {
+          return; // Level complete, don't advance color
+        }
+
+        // Move to next color in level
         setCurrentColorIndex((prev) => {
-          const nextIndex = (prev + 1) % COLORS.length;
-          console.log('  Changing color from index', prev, '(' + COLORS[prev].name + ') to index', nextIndex, '(' + COLORS[nextIndex].name + ')');
-          
-          // Update the ref immediately so checkCollision uses the new value
+          const nextIndex = (prev + 1) % levelColors.length;
           currentColorIndexRef.current = nextIndex;
-          
-          setDebugInfo(`Now match: ${COLORS[nextIndex].displayName}!`);
+          setDebugInfo(`Match: ${levelColors[nextIndex].displayName}!`);
           return nextIndex;
         });
-        
-        console.log('✓ Reset complete - new color should appear');
       }, 1000);
       
-      console.log('✓✓✓ CELEBRATION SETUP COMPLETE ✓✓✓');
     } catch (error) {
       console.error('❌ ERROR in handleCorrectMatch:', error);
-      console.error('Error details:', error.message, error.stack);
     }
   };
 
   const panResponder = useRef(
     PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
+      onStartShouldSetPanResponder: () => !showVictory,
+      onMoveShouldSetPanResponder: () => !showVictory,
       
       onPanResponderGrant: () => {
-        console.log('Pan started');
         pan.setOffset({
           x: pan.x._value,
           y: pan.y._value,
@@ -249,33 +270,19 @@ export default function ColorMatchingGame() {
       },
 
       onPanResponderRelease: (evt, gestureState) => {
-        console.log('===== DRAG RELEASED =====');
-        console.log('Touch point:', evt.nativeEvent.pageX, evt.nativeEvent.pageY);
-        console.log('Gesture delta:', gestureState.dx, gestureState.dy);
-        
         pan.flattenOffset();
 
-        // Calculate the circle's final position
         const initialCircleTop = height * 0.22 + CIRCLE_SIZE / 2;
         const initialCircleLeft = width / 2;
         
         const finalCircleCenterX = initialCircleLeft + gestureState.dx;
         const finalCircleCenterY = initialCircleTop + gestureState.dy;
-        
-        console.log('Initial circle position:', { x: initialCircleLeft, y: initialCircleTop });
-        console.log('Final circle center:', { x: finalCircleCenterX, y: finalCircleCenterY });
-        console.log('Screen dimensions:', { width, height });
-        console.log('Current color to match:', COLORS[currentColorIndex].name);
 
         const isMatch = checkCollision(finalCircleCenterX, finalCircleCenterY);
 
         if (isMatch) {
-          // Correct match!
-          console.log('✓✓✓ MATCH CONFIRMED - Triggering celebration ✓✓✓');
           handleCorrectMatch();
         } else {
-          // Bounce back
-          console.log('✗ No match - bouncing back');
           Animated.parallel([
             Animated.spring(pan, {
               toValue: { x: 0, y: 0 },
@@ -292,51 +299,79 @@ export default function ColorMatchingGame() {
     })
   ).current;
 
-  const onBoxLayout = (index, colorName) => (event) => {
-    // Calculate box positions based on screen dimensions
-    const screenWidth = Dimensions.get('window').width;
-    const screenHeight = Dimensions.get('window').height;
-    const bottomOffset = Platform.OS === 'ios' ? 100 : 80;
-    
-    // Calculate horizontal position - evenly spaced
-    const totalPadding = 30; // 15px on each side
-    const availableWidth = screenWidth - totalPadding;
-    const spacing = (availableWidth - (BOX_SIZE * 4)) / 3; // space between boxes
-    const startX = 15 + (BOX_SIZE / 2); // center of first box
-    
-    const boxCenterX = startX + (index * (BOX_SIZE + spacing));
-    const boxCenterY = screenHeight - bottomOffset - (BOX_SIZE / 2);
-    
-    console.log(`Box ${colorName} center at: (${boxCenterX}, ${boxCenterY})`);
-    
-    setBoxLayouts((prev) => {
-      const newLayouts = [...prev];
-      newLayouts[index] = {
-        color: colorName,
-        x: boxCenterX - (BOX_SIZE / 2), // top-left x
-        y: boxCenterY - (BOX_SIZE / 2), // top-left y
-        centerX: boxCenterX,
-        centerY: boxCenterY,
-        width: BOX_SIZE,
-        height: BOX_SIZE,
-      };
-      return newLayouts;
-    });
-  };
+  const currentColor = levelColors[currentColorIndex];
 
-  const currentColor = COLORS[currentColorIndex];
-  
-  console.log('Rendering circle with color:', currentColor.name, currentColor.value);
+  if (showVictory) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.victoryContainer}>
+          {/* Confetti */}
+          {[...Array(20)].map((_, i) => (
+            <Animated.View
+              key={i}
+              style={[
+                styles.confetti,
+                {
+                  left: (width / 20) * i,
+                  backgroundColor: COLORS[i % COLORS.length].value,
+                  transform: [
+                    {
+                      translateY: confettiAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [-50, height],
+                      }),
+                    },
+                    {
+                      rotate: confettiAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: ['0deg', '360deg'],
+                      }),
+                    },
+                  ],
+                },
+              ]}
+            />
+          ))}
+
+          <MaterialCommunityIcons name="trophy" size={120} color="#FFD700" />
+          <Text style={styles.victoryTitle}>YOU DID IT!</Text>
+          <Text style={styles.victorySubtitle}>All 5 Levels Complete!</Text>
+          
+          <View style={styles.victoryStars}>
+            <MaterialCommunityIcons name="star" size={50} color="#FFD700" />
+            <Text style={styles.victoryStarText}>{lifetimeStars} Total Stars!</Text>
+          </View>
+
+          <TouchableOpacity style={styles.playAgainButton} onPress={playAgain}>
+            <Text style={styles.playAgainText}>PLAY AGAIN</Text>
+            <MaterialCommunityIcons name="replay" size={30} color="#FFF" />
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
       <View style={styles.background}>
+        {/* Level Indicator */}
+        <View style={styles.levelContainer}>
+          <Text style={styles.levelText}>Level {currentLevel + 1}</Text>
+          <Text style={styles.levelName}>{LEVELS[currentLevel].name}</Text>
+        </View>
+
         {/* Star Counter */}
         <View style={styles.starContainer}>
           <Animated.View style={{ transform: [{ scale: starAnim }] }}>
-            <MaterialCommunityIcons name="star" size={50} color="#FFD700" />
+            <MaterialCommunityIcons name="star" size={40} color="#FFD700" />
           </Animated.View>
           <Text style={styles.starText}>{stars}</Text>
+        </View>
+
+        {/* Lifetime Stars */}
+        <View style={styles.lifetimeContainer}>
+          <MaterialCommunityIcons name="star-circle" size={30} color="#FFD700" />
+          <Text style={styles.lifetimeText}>{lifetimeStars}</Text>
         </View>
 
         {/* Draggable Circle */}
@@ -375,15 +410,11 @@ export default function ColorMatchingGame() {
                 <MaterialCommunityIcons name="star-four-points" size={80} color="#FFD700" />
                 <MaterialCommunityIcons name="star-four-points" size={50} color="#FFF" style={styles.sparkle1} />
                 <MaterialCommunityIcons name="star-four-points" size={50} color="#FFF" style={styles.sparkle2} />
-                <MaterialCommunityIcons name="star-four-points" size={50} color="#FFF" style={styles.sparkle3} />
               </Animated.View>
             )}
           </Animated.View>
         </View>
 
-        {/* Instruction Text */}
-        <Text style={styles.instructionText}>Drag the circle to matching color!</Text>
-        
         {/* Debug Info */}
         <View style={styles.debugContainer}>
           <Text style={styles.debugText}>{debugInfo}</Text>
@@ -391,12 +422,23 @@ export default function ColorMatchingGame() {
 
         {/* Color Boxes */}
         <View style={styles.boxesContainer}>
-          {COLORS.map((color, index) => (
+          {levelColors.map((color, index) => (
             <View
-              key={color.name}
-              style={[styles.box, { backgroundColor: color.value }]}
-              onLayout={onBoxLayout(index, color.name)}
-            />
+              key={`${color.name}-${index}`}
+              style={[
+                styles.box,
+                { 
+                  backgroundColor: color.value,
+                  width: BOX_SIZE,
+                  height: BOX_SIZE,
+                  opacity: matchedColors.includes(color.name) ? 0.4 : 1,
+                },
+              ]}
+            >
+              {matchedColors.includes(color.name) && (
+                <MaterialCommunityIcons name="check-circle" size={40} color="#FFF" />
+              )}
+            </View>
           ))}
         </View>
       </View>
@@ -412,32 +454,76 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#87CEEB',
   },
+  levelContainer: {
+    position: 'absolute',
+    top: Platform.OS === 'ios' ? 50 : 30,
+    left: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  levelText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#FF6347',
+  },
+  levelName: {
+    fontSize: 14,
+    color: '#666',
+  },
   starContainer: {
     position: 'absolute',
-    top: Platform.OS === 'ios' ? 60 : 50,
-    right: 30,
+    top: Platform.OS === 'ios' ? 50 : 30,
+    right: 20,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 30,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 10,
-    zIndex: 1000,
+    shadowRadius: 4,
+    elevation: 5,
   },
   starText: {
-    fontSize: 40,
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#FF6347',
-    marginLeft: 12,
+    marginLeft: 8,
+  },
+  lifetimeContainer: {
+    position: 'absolute',
+    top: Platform.OS === 'ios' ? 110 : 90,
+    right: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 215, 0, 0.9)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  lifetimeText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FFF',
+    marginLeft: 6,
   },
   circleContainer: {
     position: 'absolute',
-    top: height * 0.22,
+    top: height * 0.25,
     left: width / 2 - CIRCLE_SIZE / 2,
     width: CIRCLE_SIZE,
     height: CIRCLE_SIZE,
@@ -474,33 +560,15 @@ const styles = StyleSheet.create({
     bottom: -30,
     left: -20,
   },
-  sparkle3: {
-    position: 'absolute',
-    top: -20,
-    left: -30,
-  },
-  instructionText: {
-    position: 'absolute',
-    top: height * 0.48,
-    width: '100%',
-    textAlign: 'center',
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: '#FFF',
-    paddingHorizontal: 20,
-    textShadowColor: 'rgba(0, 0, 0, 0.6)',
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 6,
-  },
   debugContainer: {
     position: 'absolute',
-    top: Platform.OS === 'ios' ? 140 : 120,
+    top: Platform.OS === 'ios' ? 160 : 140,
     width: '100%',
     alignItems: 'center',
     paddingHorizontal: 20,
   },
   debugText: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#FF1493',
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
@@ -516,22 +584,88 @@ const styles = StyleSheet.create({
   },
   boxesContainer: {
     position: 'absolute',
-    bottom: Platform.OS === 'ios' ? 100 : 80,
+    bottom: Platform.OS === 'ios' ? 60 : 40,
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-evenly',
-    paddingHorizontal: 15,
+    paddingHorizontal: 10,
+    flexWrap: 'wrap',
   },
   box: {
-    width: BOX_SIZE,
-    height: BOX_SIZE,
-    borderRadius: 22,
+    borderRadius: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.5,
     shadowRadius: 10,
     elevation: 12,
-    borderWidth: 6,
+    borderWidth: 5,
     borderColor: '#FFF',
+    marginHorizontal: 4,
+    marginVertical: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  victoryContainer: {
+    flex: 1,
+    backgroundColor: '#FFD700',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  confetti: {
+    position: 'absolute',
+    width: 10,
+    height: 20,
+    borderRadius: 5,
+  },
+  victoryTitle: {
+    fontSize: 56,
+    fontWeight: 'bold',
+    color: '#FFF',
+    marginTop: 20,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 5,
+  },
+  victorySubtitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#FF6347',
+    marginTop: 10,
+  },
+  victoryStars: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 30,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    paddingHorizontal: 30,
+    paddingVertical: 15,
+    borderRadius: 30,
+  },
+  victoryStarText: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#FF6347',
+    marginLeft: 10,
+  },
+  playAgainButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FF6347',
+    paddingHorizontal: 40,
+    paddingVertical: 20,
+    borderRadius: 30,
+    marginTop: 40,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 8,
+  },
+  playAgainText: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#FFF',
+    marginRight: 10,
   },
 });
