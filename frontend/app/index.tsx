@@ -59,9 +59,14 @@ const BOX_SIZE = 90;
 export default function ColorMatchingGame() {
   const [currentColorIndex, setCurrentColorIndex] = useState(0);
   const [stars, setStars] = useState(0);
+  const [lifetimeStars, setLifetimeStars] = useState(0);
+  const [currentLevel, setCurrentLevel] = useState(0); // 0-4 for levels 1-5
+  const [matchedColors, setMatchedColors] = useState([]); // Track which colors matched in current level
   const [showSparkles, setShowSparkles] = useState(false);
   const [boxLayouts, setBoxLayouts] = useState([]);
   const [debugInfo, setDebugInfo] = useState('Drag circle to matching box!');
+  const [showVictory, setShowVictory] = useState(false);
+  const [confettiPieces, setConfettiPieces] = useState([]);
 
   const pan = useRef(new Animated.ValueXY()).current;
   const sparkleAnim = useRef(new Animated.Value(0)).current;
