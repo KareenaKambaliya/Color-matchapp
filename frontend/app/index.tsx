@@ -460,6 +460,17 @@ export default function ColorMatchingGame() {
           <Text style={styles.debugText}>{debugInfo}</Text>
         </View>
 
+        {/* Debug: Manual Level Advance Button */}
+        <TouchableOpacity 
+          style={styles.debugButton} 
+          onPress={() => {
+            console.log('🔘 Manual advance button pressed');
+            advanceLevel();
+          }}
+        >
+          <Text style={styles.debugButtonText}>Skip to Next Level</Text>
+        </TouchableOpacity>
+
         {/* Color Boxes */}
         <View style={styles.boxesContainer}>
           {levelColors.map((color, index) => (
