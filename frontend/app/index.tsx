@@ -141,13 +141,24 @@ export default function ColorMatchingGame() {
   };
 
   const advanceLevel = () => {
+    console.log('🚀 ADVANCING LEVEL!');
+    console.log('Current level before:', currentLevelRef.current);
+    
     const nextLevel = currentLevel + 1;
+    console.log('Next level will be:', nextLevel);
+    
     setCurrentLevel(nextLevel);
     currentLevelRef.current = nextLevel;
+    
     setCurrentColorIndex(0);
     currentColorIndexRef.current = 0;
+    
     setMatchedColors([]);
-    setDebugInfo(`LEVEL ${nextLevel + 1}: ${LEVELS[nextLevel].name}!`);
+    
+    const nextLevelName = LEVELS[nextLevel].name;
+    setDebugInfo(`Level ${nextLevel + 1}: ${nextLevelName}!`);
+    
+    console.log('✅ Level advanced! Now on level:', nextLevel + 1);
     speakColor(`Level ${nextLevel + 1}`);
   };
 
