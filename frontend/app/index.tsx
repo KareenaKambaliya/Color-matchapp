@@ -164,6 +164,10 @@ export default function ColorMatchingGame() {
         setCurrentColorIndex((prev) => {
           const nextIndex = (prev + 1) % COLORS.length;
           console.log('  Changing color from index', prev, '(' + COLORS[prev].name + ') to index', nextIndex, '(' + COLORS[nextIndex].name + ')');
+          
+          // Update the ref immediately so checkCollision uses the new value
+          currentColorIndexRef.current = nextIndex;
+          
           setDebugInfo(`Now match: ${COLORS[nextIndex].displayName}!`);
           return nextIndex;
         });
