@@ -188,6 +188,7 @@ export default function ColorMatchingGame() {
     try {
       console.log('✓✓✓ CELEBRATION STARTING ✓✓✓');
       const currentColor = levelColors[currentColorIndexRef.current];
+      console.log('Matched color:', currentColor.name);
       
       setShowSparkles(true);
       
@@ -226,7 +227,11 @@ export default function ColorMatchingGame() {
 
       // Mark this color as matched
       const newMatched = [...matchedColors, currentColor.name];
+      console.log('New matched array:', newMatched);
       setMatchedColors(newMatched);
+
+      // Check if level is complete BEFORE resetting
+      const isLevelComplete = checkLevelComplete(newMatched);
 
       setTimeout(() => {
         pan.flattenOffset();
@@ -234,22 +239,25 @@ export default function ColorMatchingGame() {
         pan.setOffset({ x: 0, y: 0 });
         scaleAnim.setValue(1);
         
-        // Check if level is complete
-        if (checkLevelComplete(newMatched)) {
+        if (isLevelComplete) {
+          console.log('✅ Level complete - not advancing color');
           return; // Level complete, don't advance color
         }
 
         // Move to next color in level
+        console.log('➡️ Moving to next color in level');
         setCurrentColorIndex((prev) => {
           const nextIndex = (prev + 1) % levelColors.length;
           currentColorIndexRef.current = nextIndex;
           setDebugInfo(`Match: ${levelColors[nextIndex].displayName}!`);
+          console.log('Next color:', levelColors[nextIndex].name);
           return nextIndex;
         });
       }, 1000);
       
     } catch (error) {
       console.error('❌ ERROR in handleCorrectMatch:', error);
+      console.error('Stack:', error.stack);
     }
   };
 
