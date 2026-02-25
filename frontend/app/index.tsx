@@ -225,9 +225,13 @@ export default function ColorMatchingGame() {
       setStars((prev) => prev + 1);
       setLifetimeStars((prev) => prev + 1);
 
-      // Mark this color as matched
-      const newMatched = [...matchedColors, currentColor.name];
+      // Mark this color as matched (avoid duplicates)
+      let newMatched = [...matchedColors];
+      if (!newMatched.includes(currentColor.name)) {
+        newMatched.push(currentColor.name);
+      }
       console.log('New matched array:', newMatched);
+      console.log('Unique matched count:', newMatched.length);
       setMatchedColors(newMatched);
 
       // Check if level is complete BEFORE resetting
