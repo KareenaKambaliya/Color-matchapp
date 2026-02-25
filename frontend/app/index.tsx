@@ -72,7 +72,9 @@ export default function ColorMatchingGame() {
   const sparkleAnim = useRef(new Animated.Value(0)).current;
   const starAnim = useRef(new Animated.Value(1)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
+  const confettiAnim = useRef(new Animated.Value(0)).current;
   const currentColorIndexRef = useRef(0);
+  const currentLevelRef = useRef(0);
 
   const speakColor = (colorName) => {
     try {
