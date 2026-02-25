@@ -506,6 +506,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
   },
+  progressText: {
+    fontSize: 12,
+    color: '#FF6347',
+    fontWeight: 'bold',
+    marginTop: 2,
+  },
   starContainer: {
     position: 'absolute',
     top: Platform.OS === 'ios' ? 50 : 30,
