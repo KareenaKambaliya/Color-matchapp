@@ -115,9 +115,9 @@ export default function ColorMatchingGame() {
     console.log('Total colors in level:', levelColors.length);
     console.log('Level colors:', levelColors.map(c => c.name));
     
-    if (newMatchedColors.length === levelColors.length) {
+    if (newMatchedColors.length >= levelColors.length) {
       console.log('🎉 LEVEL COMPLETE!');
-      setDebugInfo('LEVEL COMPLETE! 🎉');
+      setDebugInfo('🎉 LEVEL COMPLETE! 🎉');
       
       if (currentLevelRef.current === 4) {
         // Beat Level 5 - Show victory!
@@ -127,14 +127,16 @@ export default function ColorMatchingGame() {
         }, 1500);
       } else {
         // Advance to next level
-        console.log('⬆️ Advancing to next level...');
+        const nextLevelNum = currentLevelRef.current + 2;
+        console.log(`⬆️ Advancing to Level ${nextLevelNum}...`);
         setTimeout(() => {
           advanceLevel();
         }, 1500);
       }
       return true;
     }
-    console.log('❌ Level not complete yet. Need', levelColors.length - newMatchedColors.length, 'more');
+    const remaining = levelColors.length - newMatchedColors.length;
+    console.log(`❌ Level not complete yet. Need ${remaining} more`);
     return false;
   };
 
