@@ -529,19 +529,23 @@ export default function ColorMatchingGame() {
           {levelColors.map((color, index) => (
             <View
               key={`${color.name}-${index}`}
-              style={[
-                styles.box,
-                { 
-                  backgroundColor: color.value,
-                  width: BOX_SIZE,
-                  height: BOX_SIZE,
-                  opacity: matchedColors.includes(color.name) ? 0.4 : 1,
-                },
-              ]}
+              style={[styles.boxSection, { width: `${100 / levelColors.length}%` }]}
             >
-              {matchedColors.includes(color.name) && (
-                <MaterialCommunityIcons name="check-circle" size={40} color="#FFF" />
-              )}
+              <View
+                style={[
+                  styles.box,
+                  { 
+                    backgroundColor: color.value,
+                    width: BOX_SIZE,
+                    height: BOX_SIZE,
+                    opacity: matchedColors.includes(color.name) ? 0.4 : 1,
+                  },
+                ]}
+              >
+                {matchedColors.includes(color.name) && (
+                  <MaterialCommunityIcons name="check-circle" size={40} color="#FFF" />
+                )}
+              </View>
             </View>
           ))}
         </View>
