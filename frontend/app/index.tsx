@@ -84,8 +84,8 @@ export default function ColorMatchingGame() {
     const currentColor = levelColors[colorIndex];
     
     console.log('🎯 === COLLISION CHECK ===');
-    console.log('Circle center X:', circleCenterX);
-    console.log('Circle center Y:', circleCenterY);
+    console.log('Circle center X:', circleCenterX.toFixed(0));
+    console.log('Circle center Y:', circleCenterY.toFixed(0));
     console.log('Current level:', currentLevelRef.current + 1);
     console.log('Number of boxes:', levelColors.length);
     console.log('Need to match:', currentColor.name);
@@ -93,35 +93,39 @@ export default function ColorMatchingGame() {
     setDebugInfo(`Need: ${currentColor.displayName.toUpperCase()}`);
     
     const bottomThreshold = height * 0.6;
-    console.log('Bottom threshold:', bottomThreshold);
-    console.log('Is in bottom area?', circleCenterY > bottomThreshold);
     
     if (circleCenterY < bottomThreshold) {
       setDebugInfo(`Drag to bottom area!`);
       return false;
     }
     
-    // Calculate box sections
+    // Better collision: find closest box center
     const boxWidth = width / levelColors.length;
-    console.log('Screen width:', width);
-    console.log('Box width (each section):', boxWidth);
+    const padding = 20; // Total horizontal padding
+    const availableWidth = width - padding;
+    const boxSpacing = availableWidth / levelColors.length;
     
-    // Show all box sections
-    console.log('Box sections:');
-    levelColors.forEach((color, i) => {
-      const start = i * boxWidth;
-      const end = (i + 1) * boxWidth;
-      console.log(`  Box ${i} (${color.name}): ${start.toFixed(0)} - ${end.toFixed(0)}`);
-    });
+    console.log('Finding closest box:');
+    let closestIndex = 0;
+    let minDistance = Infinity;
     
-    let selectedBoxIndex = Math.floor(circleCenterX / boxWidth);
-    selectedBoxIndex = Math.max(0, Math.min(levelColors.length - 1, selectedBoxIndex));
+    for (let i = 0; i < levelColors.length; i++) {
+      // Calculate box center position (accounting for space-evenly)
+      const boxCenterX = padding / 2 + boxSpacing / 2 + (i * boxSpacing);
+      const distance = Math.abs(circleCenterX - boxCenterX);
+      
+      console.log(`  Box ${i} (${levelColors[i].name}): center at ${boxCenterX.toFixed(0)}, distance: ${distance.toFixed(0)}`);
+      
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestIndex = i;
+      }
+    }
     
-    const selectedColor = levelColors[selectedBoxIndex];
+    const selectedColor = levelColors[closestIndex];
     
-    console.log('👉 Circle X position:', circleCenterX.toFixed(0));
-    console.log('👉 Selected box index:', selectedBoxIndex);
-    console.log('👉 Selected box color:', selectedColor.name);
+    console.log('👉 Closest box:', closestIndex, `(${selectedColor.name})`);
+    console.log('👉 Distance:', minDistance.toFixed(0), 'pixels');
     console.log('👉 Need color:', currentColor.name);
     console.log('👉 MATCH?', selectedColor.name === currentColor.name ? '✅ YES' : '❌ NO');
     
@@ -129,7 +133,7 @@ export default function ColorMatchingGame() {
       setDebugInfo(`✓ ${currentColor.displayName.toUpperCase()}!`);
       return true;
     } else {
-      setDebugInfo(`✗ That's ${selectedColor.displayName.toUpperCase()}, try ${currentColor.displayName.toUpperCase()}`);
+      setDebugInfo(`That's ${selectedColor.displayName.toUpperCase()}, try ${currentColor.displayName.toUpperCase()}`);
       return false;
     }
   };
