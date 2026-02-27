@@ -698,9 +698,11 @@ const styles = StyleSheet.create({
     bottom: Platform.OS === 'ios' ? 60 : 40,
     width: '100%',
     flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    paddingHorizontal: 10,
-    flexWrap: 'wrap',
+    height: 120,
+  },
+  boxSection: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   box: {
     borderRadius: 16,
@@ -711,8 +713,6 @@ const styles = StyleSheet.create({
     elevation: 12,
     borderWidth: 5,
     borderColor: '#FFF',
-    marginHorizontal: 4,
-    marginVertical: 4,
     justifyContent: 'center',
     alignItems: 'center',
   },
