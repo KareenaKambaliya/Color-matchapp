@@ -83,29 +83,53 @@ export default function ColorMatchingGame() {
     const colorIndex = currentColorIndexRef.current;
     const currentColor = levelColors[colorIndex];
     
-    console.log('Checking collision - colorIndex from ref:', colorIndex, 'color:', currentColor.name);
+    console.log('🎯 === COLLISION CHECK ===');
+    console.log('Circle center X:', circleCenterX);
+    console.log('Circle center Y:', circleCenterY);
+    console.log('Current level:', currentLevelRef.current + 1);
+    console.log('Number of boxes:', levelColors.length);
+    console.log('Need to match:', currentColor.name);
+    
     setDebugInfo(`Need: ${currentColor.displayName.toUpperCase()}`);
     
     const bottomThreshold = height * 0.6;
+    console.log('Bottom threshold:', bottomThreshold);
+    console.log('Is in bottom area?', circleCenterY > bottomThreshold);
     
     if (circleCenterY < bottomThreshold) {
       setDebugInfo(`Drag to bottom area!`);
       return false;
     }
     
+    // Calculate box sections
     const boxWidth = width / levelColors.length;
+    console.log('Screen width:', width);
+    console.log('Box width (each section):', boxWidth);
+    
+    // Show all box sections
+    console.log('Box sections:');
+    levelColors.forEach((color, i) => {
+      const start = i * boxWidth;
+      const end = (i + 1) * boxWidth;
+      console.log(`  Box ${i} (${color.name}): ${start.toFixed(0)} - ${end.toFixed(0)}`);
+    });
+    
     let selectedBoxIndex = Math.floor(circleCenterX / boxWidth);
     selectedBoxIndex = Math.max(0, Math.min(levelColors.length - 1, selectedBoxIndex));
     
     const selectedColor = levelColors[selectedBoxIndex];
     
-    console.log('Selected box:', selectedBoxIndex, selectedColor.name, '| Need:', currentColor.name);
+    console.log('👉 Circle X position:', circleCenterX.toFixed(0));
+    console.log('👉 Selected box index:', selectedBoxIndex);
+    console.log('👉 Selected box color:', selectedColor.name);
+    console.log('👉 Need color:', currentColor.name);
+    console.log('👉 MATCH?', selectedColor.name === currentColor.name ? '✅ YES' : '❌ NO');
     
     if (selectedColor.name === currentColor.name) {
       setDebugInfo(`✓ ${currentColor.displayName.toUpperCase()}!`);
       return true;
     } else {
-      setDebugInfo(`✗ Try ${currentColor.displayName.toUpperCase()}`);
+      setDebugInfo(`✗ That's ${selectedColor.displayName.toUpperCase()}, try ${currentColor.displayName.toUpperCase()}`);
       return false;
     }
   };
