@@ -54,6 +54,7 @@ export default function ColorMatchingGame() {
   const confettiAnim = useRef(new Animated.Value(0)).current;
   const currentColorIndexRef = useRef(0);
   const currentLevelRef = useRef(0);
+  const matchedColorsRef = useRef([]);
 
   // Get current level colors
   const levelColors = LEVELS[currentLevel].colors.map(colorName => 
