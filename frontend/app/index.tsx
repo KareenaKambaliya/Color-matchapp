@@ -254,15 +254,30 @@ export default function ColorMatchingGame() {
       if (!newMatched.includes(currentColor.name)) {
         newMatched.push(currentColor.name);
       }
+      
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('📊 MATCH CHECK:');
+      console.log('Previous matchedColors state:', matchedColors);
+      console.log('Just matched:', currentColor.name);
       console.log('New matched array:', newMatched);
-      console.log('Unique matched count:', newMatched.length);
+      console.log('New matched count:', newMatched.length);
       
       // Check if ALL level colors are now matched
       const allLevelColors = levelColors.map(c => c.name);
+      console.log('All level colors needed:', allLevelColors);
+      console.log('Level colors count:', allLevelColors.length);
+      
+      // Check each color individually
+      console.log('Checking each color:');
+      allLevelColors.forEach(color => {
+        const isMatched = newMatched.includes(color);
+        console.log(`  ${color}: ${isMatched ? '✅ matched' : '❌ not matched'}`);
+      });
+      
       const allMatched = allLevelColors.every(color => newMatched.includes(color));
       
-      console.log('All level colors:', allLevelColors);
-      console.log('All matched?', allMatched);
+      console.log('ALL MATCHED?', allMatched ? '✅ YES!' : '❌ NO');
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       
       setMatchedColors(newMatched);
 
