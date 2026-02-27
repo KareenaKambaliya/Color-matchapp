@@ -84,56 +84,53 @@ export default function ColorMatchingGame() {
     const currentColor = levelColors[colorIndex];
     
     console.log('🎯 === COLLISION CHECK ===');
-    console.log('Circle center X:', circleCenterX.toFixed(0));
-    console.log('Circle center Y:', circleCenterY.toFixed(0));
-    console.log('Current level:', currentLevelRef.current + 1);
-    console.log('Number of boxes:', levelColors.length);
-    console.log('Need to match:', currentColor.name);
+    console.log('🔵 CIRCLE INFO:');
+    console.log('  Color index:', colorIndex);
+    console.log('  Circle color:', currentColor.name, currentColor.value);
+    console.log('  Circle position: X=' + circleCenterX.toFixed(0) + ', Y=' + circleCenterY.toFixed(0));
     
-    setDebugInfo(`Need: ${currentColor.displayName.toUpperCase()}`);
+    console.log('📦 LEVEL INFO:');
+    console.log('  Current level:', currentLevelRef.current + 1);
+    console.log('  Level colors:', levelColors.map(c => c.name).join(', '));
+    console.log('  Number of boxes:', levelColors.length);
+    
+    setDebugInfo(`Circle: ${currentColor.displayName.toUpperCase()}`);
     
     const bottomThreshold = height * 0.6;
     
     if (circleCenterY < bottomThreshold) {
-      setDebugInfo(`Drag to bottom area!`);
+      setDebugInfo(`Drag ${currentColor.displayName.toUpperCase()} down!`);
       return false;
     }
     
-    // Better collision: find closest box center
-    const boxWidth = width / levelColors.length;
-    const padding = 20; // Total horizontal padding
-    const availableWidth = width - padding;
-    const boxSpacing = availableWidth / levelColors.length;
+    // Simple approach: divide screen into equal sections
+    const sectionWidth = width / levelColors.length;
+    let selectedIndex = Math.floor(circleCenterX / sectionWidth);
     
-    console.log('Finding closest box:');
-    let closestIndex = 0;
-    let minDistance = Infinity;
+    // Clamp to valid range
+    selectedIndex = Math.max(0, Math.min(levelColors.length - 1, selectedIndex));
     
-    for (let i = 0; i < levelColors.length; i++) {
-      // Calculate box center position (accounting for space-evenly)
-      const boxCenterX = padding / 2 + boxSpacing / 2 + (i * boxSpacing);
-      const distance = Math.abs(circleCenterX - boxCenterX);
-      
-      console.log(`  Box ${i} (${levelColors[i].name}): center at ${boxCenterX.toFixed(0)}, distance: ${distance.toFixed(0)}`);
-      
-      if (distance < minDistance) {
-        minDistance = distance;
-        closestIndex = i;
-      }
-    }
+    const selectedColor = levelColors[selectedIndex];
     
-    const selectedColor = levelColors[closestIndex];
-    
-    console.log('👉 Closest box:', closestIndex, `(${selectedColor.name})`);
-    console.log('👉 Distance:', minDistance.toFixed(0), 'pixels');
-    console.log('👉 Need color:', currentColor.name);
-    console.log('👉 MATCH?', selectedColor.name === currentColor.name ? '✅ YES' : '❌ NO');
+    console.log('📊 COLLISION RESULT:');
+    console.log('  Screen width:', width);
+    console.log('  Section width:', sectionWidth.toFixed(0));
+    console.log('  Sections:', levelColors.map((c, i) => {
+      const start = i * sectionWidth;
+      const end = (i + 1) * sectionWidth;
+      return `${c.name}(${start.toFixed(0)}-${end.toFixed(0)})`;
+    }).join(', '));
+    console.log('  Circle X:', circleCenterX.toFixed(0));
+    console.log('  Selected index:', selectedIndex);
+    console.log('  Selected box color:', selectedColor.name);
+    console.log('  Need color:', currentColor.name);
+    console.log('  MATCH:', selectedColor.name === currentColor.name ? '✅ YES!' : '❌ NO');
     
     if (selectedColor.name === currentColor.name) {
-      setDebugInfo(`✓ ${currentColor.displayName.toUpperCase()}!`);
+      setDebugInfo(`✓ MATCHED ${currentColor.displayName.toUpperCase()}!`);
       return true;
     } else {
-      setDebugInfo(`That's ${selectedColor.displayName.toUpperCase()}, try ${currentColor.displayName.toUpperCase()}`);
+      setDebugInfo(`${currentColor.displayName.toUpperCase()} ≠ ${selectedColor.displayName.toUpperCase()}`);
       return false;
     }
   };
