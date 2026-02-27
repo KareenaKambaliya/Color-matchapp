@@ -250,15 +250,19 @@ export default function ColorMatchingGame() {
       setStars((prev) => prev + 1);
       setLifetimeStars((prev) => prev + 1);
 
-      // Mark this color as matched (avoid duplicates)
-      let newMatched = [...matchedColors];
+      // Mark this color as matched (avoid duplicates) - USE REF for latest value
+      let newMatched = [...matchedColorsRef.current];
       if (!newMatched.includes(currentColor.name)) {
         newMatched.push(currentColor.name);
       }
       
+      // Update BOTH state and ref
+      matchedColorsRef.current = newMatched;
+      setMatchedColors(newMatched);
+      
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       console.log('📊 MATCH CHECK:');
-      console.log('Previous matchedColors state:', matchedColors);
+      console.log('Previous matched (from REF):', matchedColorsRef.current);
       console.log('Just matched:', currentColor.name);
       console.log('New matched array:', newMatched);
       console.log('New matched count:', newMatched.length);
