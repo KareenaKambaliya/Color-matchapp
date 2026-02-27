@@ -166,6 +166,7 @@ export default function ColorMatchingGame() {
     currentColorIndexRef.current = 0;
     
     setMatchedColors([]);
+    matchedColorsRef.current = []; // Reset ref too!
     
     const nextLevelName = LEVELS[nextLevel].name;
     setDebugInfo(`Level ${nextLevel + 1}: ${nextLevelName}!`);
